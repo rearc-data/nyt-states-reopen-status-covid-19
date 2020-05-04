@@ -49,7 +49,7 @@ Resources:
       FunctionName:
         !Join
           - ''
-          - - 'source-revision-updates-for-'
+          - - 'source-for-'
             - !Ref DataSetName
       Description: "Source revision updates to AWS Data Exchange data set"
       Runtime: "python3.7"

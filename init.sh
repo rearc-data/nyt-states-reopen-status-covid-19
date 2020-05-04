@@ -26,7 +26,7 @@ do
     "-p"|"--product-name") export PRODUCT_NAME="$1"; shift;;
     "-i"|"--product-id") export PRODUCT_ID="$1"; shift;;
     "-r"|"--region") export REGION="$1"; shift;;
-    "--profile") PROFILE=" --profile $1"; shift;;
+    "-f"|"--profile") PROFILE=" --profile $1"; shift;;
     *) echo "ERROR: Invalid option: \""$opt"\"" >&2
         exit 1;;
   esac
