@@ -15,9 +15,9 @@ The included dataset is presented in CSV and JSON format. The included dataset h
 `state_abbreviation, status, state, date_details, status_details, external_link, reopened, reopening_soon, population`
 
 
-- `state_abbreviation`: two letter state abbreviation (e.g. NY, CA)
-- `status`: current state of reopen and/or shut down (e.g. reopening, shutdown-restricted)
-- `state`: state's name (e.g. New York, California)
+- `state_abbreviation`: two letter state abbreviation (e.g. `NY`, `CA`)
+- `status`: current state of reopen and/or shut down (e.g. `reopening`, `shutdown-restricted`)
+- `state`: state's name (e.g. `New York`, `California`)
 - `date_details`: information regarding when restrictions were put in place, when they or set to expire, or when they were lifted
 - `status_details`: additional details regarding specific restrictions in place in a given state
 - `external_link`: additional resource referenced by the NY Times when compiling the current state of reopen and/or shut down in a given state
