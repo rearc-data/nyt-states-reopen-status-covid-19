@@ -159,7 +159,8 @@ def source_dataset(new_filename, s3_bucket, new_s3_key):
     parser.feed(str_html)
 
     population_source = 'https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/state/detail/SCPRC-EST2019-18+POP-RES.csv'
-    population_csv = urlopen(population_source).read().decode().splitlines()
+    population_csv = urlopen(population_source).read().decode().replace(
+        'Puerto Rico Commonwealth', 'Puerto Rico').splitlines()
 
     population_data = {}
 
