@@ -24,7 +24,7 @@ The included dataset is presented in CSV and JSON format, and is presented with 
 - `external_link`: additional resource referenced in the New York Times article
 - `population`: United States Census Bureau's 2019 estimate for a state's total population
 
-The columns beginning with `reopened` and `reopening_soon` offer specific details on the state of resources/bussinesses within a given category. The included categories are:
+The columns beginning with `reopened` and `reopening_soon` offer specific details on the current state of resources/bussinesses within a given category. The included categories are:
 - `personal_care`
 - `retail`
 - `outdoor_and_recreation`
