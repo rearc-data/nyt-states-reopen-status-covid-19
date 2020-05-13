@@ -14,19 +14,30 @@ This resource is adapted from two sources:
 1. [The New York Times | See Which States Are Reopening and Which Are Still Shut Down](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html)
 2. [United States Census Bureau | State Population Totals: 2010-2019](https://www.census.gov/data/datasets/time-series/demo/popest/2010s-state-total.html)
 
-The included dataset is presented in CSV and JSON format. The included dataset has the following columns:
+The included dataset is presented in CSV and JSON format, and is presented with the following columns:
 
-`state_abbreviation, status, state, date_details, status_details, external_link, reopened, reopening_soon, population`
+`state_abbreviation, state, status, date_details, restriction_start, restriction_end, status_details, external_link, reopened_personal_care, reopened_retail, reopened_outdoor_and_recreation, reopened_houses_of_worship, reopened_entertainment, reopened_food_and_drink, reopened_industries, reopening_soon_personal_care, reopening_soon_retail, reopening_soon_outdoor_and_recreation, reopening_soon_houses_of_worship, reopening_soon_entertainment, reopening_soon_food_and_drink, reopening_soon_industries, population`
 
 - `state_abbreviation`: two letter state abbreviation (e.g. `NY`, `CA`)
-- `status`: current state of reopen and/or shut down (e.g. `reopening`, `shutdown-restricted`)
 - `state`: state's name (e.g. `New York`, `California`)
+- `status`: current state of reopen and/or shut down (e.g. `reopening`, `shutdown-restricted`)
 - `date_details`: information regarding when restrictions were put in place, when they or set to expire, or when they were lifted
+- `restriction_start`: date parsed from date_details for when some sort of restriction was implimented
+- `restriction_end`: date parsed from date_details for when restrictions were - or are planned - to be lifted
 - `status_details`: additional details regarding specific restrictions in place in a given state
-- `external_link`: additional resource referenced by the NY Times when compiling the current state of reopen and/or shut down in a given state
-- `reopened`: list of specific resources/business that have been allowed to reopen
-- `reopening_soon`: list of specific resources/business that will be allowed to reopen soon
+- `external_link`: additional resource referenced in the New York Times article
 - `population`: United States Census Bureau's 2019 estimate for a state's total population
+
+The columns beginning with `reopened` and `reopening_soon` offer specific details on the current state of resources/bussinesses within a given category. The included categories are:
+- `personal_care`
+- `retail`
+- `outdoor_and_recreation`
+- `houses_of_worship`
+- `entertainment`
+- `food_and_drink`
+- `industries`
+
+Note, empty data fields in the CSV file or `null` values in the JSON file do not have applicable values from the data source.
 
 ## More Information
 - Source - [The New York Times | See Which States Are Reopening and Which Are Still Shut Down](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html)
