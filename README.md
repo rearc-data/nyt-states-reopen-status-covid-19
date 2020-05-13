@@ -28,7 +28,7 @@ The included dataset is presented in CSV and JSON format, and is presented with 
 - `external_link`: additional resource referenced in the New York Times article
 - `population`: United States Census Bureau's 2019 estimate for a state's total population
 
-The columns beginning with `reopened` and `reopening_soon` offer specific details on the current state of resources/bussinesses within a given category. The included categories are:
+The columns beginning with `reopened` and `reopening_soon` offer specific details on the current state of resources/businesses within a given category. The included categories are:
 - `personal_care`
 - `retail`
 - `outdoor_and_recreation`
@@ -37,7 +37,9 @@ The columns beginning with `reopened` and `reopening_soon` offer specific detail
 - `food_and_drink`
 - `industries`
 
-Note, empty data fields in the CSV file or `null` values in the JSON file do not have applicable values from the data source.
+Note:
+- if a  status for a category of businesses in a given state is `reopened`/`reopening_soon` but does not include further details, the corresponding data field be `True`.
+- empty data fields in the CSV file or `null` values in the JSON file do not have applicable values from the data source.
 
 ## More Information
 - Source - [The New York Times | See Which States Are Reopening and Which Are Still Shut Down](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html)
