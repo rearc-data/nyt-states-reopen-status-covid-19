@@ -15,8 +15,7 @@ set -o pipefail
 # Sets profile variable to an empty value by default, reassigns in while loop below if it was included as a parameter
 PROFILE=""
 
-while [[ $# -gt 0 ]]
-do
+while [[ $# -gt 0 ]]; do
   opt="${1}"
   shift;
   current_arg="$1"
@@ -27,9 +26,26 @@ do
     "-i"|"--product-id") export PRODUCT_ID="$1"; shift;;
     "-r"|"--region") export REGION="$1"; shift;;
     "-f"|"--profile") PROFILE=" --profile $1"; shift;;
-    *) echo "ERROR: Invalid option: \""$opt"\"" >&2
-        exit 1;;
+    *) echo "ERROR: Invalid option: \""$opt"\"" >&2; exit 1;;
   esac
+done
+
+while [[ ${#DATASET_NAME} -gt 53 ]]; do
+    echo "dataset-name must be under 53 characters in length, enter a shorter name:"
+    read -p "New dataset-name: " DATASET_NAME
+    case ${#DATASET_NAME} in
+        [1-9]|[1-4][0-9]|5[0-3]) break;;
+        * ) echo "Enter in a shorter dataset-name";;
+    esac
+done
+
+while [[ ${#PRODUCT_NAME} -gt 72 ]]; do
+    echo "product-name must be under 72 characters in length, enter a shorter name:"
+    read -p "New product-name: " PRODUCT_NAME
+    case ${#PRODUCT_NAME} in
+        [1-9]|[1-6][0-9]|7[0-2]) break;;
+        * ) echo "Enter in a shorter product-name";;
+    esac
 done
 
 #creating a pre-processing zip package, these commands may need to be adjusted depending on folder structure and dependencies
@@ -73,7 +89,7 @@ DATASET_REVISION_STATUS=$(aws dataexchange list-data-set-revisions --data-set-id
 
 update () {
   echo ""
-  echo "Please manually create the ADX product and enter in the Product ID below:"
+  echo "Manually create the ADX product and enter in the Product ID below:"
   read -p "Product ID: " NEW_PRODUCT_ID
   
   # Cloudformation stack update
@@ -120,11 +136,11 @@ then
       case $Y_N in
           [Yy]* ) update; exit;;
           [Nn]* ) delete; break;;
-          * ) echo "Please enter 'y' or 'n'.";;
+          * ) echo "Enter 'y' or 'n'.";;
       esac
   done
 
-  echo "Please manually create the ADX product and manually re-run the pre-processing CloudFormation template using the following params:"
+  echo "Manually create the ADX product and manually re-run the pre-processing CloudFormation template using the following params:"
   echo ""
   echo "S3Bucket: $S3_BUCKET"
   echo "DataSetName: $DATASET_NAME"
