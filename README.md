@@ -18,7 +18,6 @@ This resource is adapted from two sources:
 
 The included dataset is presented in CSV and JSON format, and is presented with the following columns:
 
-
 - `state_abbreviation`: two letter state abbreviation (e.g. `NY`, `CA`)
 - `state`: state's name (e.g. `New York`, `California`)
 - `status`: current state of opening and/or closing (e.g. `reopened`, `reopening`, `pausing`, `reversing`)
@@ -44,7 +43,7 @@ Note:
 
 ### Changelog
 #### 2020-7-1
-- Adjustments to the resulting dataset was needed to account for changes to The New York Times article. Resulting datasets now offer details in `opened_` and `closed_` prefixes.
+- Adjustments to the resulting dataset was needed to account for changes to The New York Times article. Resulting dataset now offer details in `opened_` and `closed_` prefixes.
 
 ## More Information
 - Source - [The New York Times | See How All 50 States Are Reopening (and Closing Again)](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html)
