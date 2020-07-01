@@ -277,11 +277,6 @@ def source_dataset(new_filename, s3_bucket, new_s3_key):
     for category in parser.categories:
         fieldnames.append(category)
 
-    print(len(parser.categories))
-
-    # for category in parser.categories:
-    # 	fieldnames.append('closed_' + category)
-
     fieldnames.append('population')
 
     # creating the csv file
