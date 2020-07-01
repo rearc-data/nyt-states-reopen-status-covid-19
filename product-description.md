@@ -1,24 +1,23 @@
-# COVID-19 United States Reopen and Shut Down Status by State | NY Times
+# COVID-19 United States Reopening and Closing Status by State | NY Times
 
 The source code outlining how this product gathers, transforms, revises and publishes its datasets is available at [https://github.com/rearc-data/nyt-states-reopen-status-covid-19](https://github.com/rearc-data/nyt-states-reopen-status-covid-19).
 
 ## Main Overview
-This resource is adapted from an article published by The New York Times - [See Which States Are Reopening and Which Are Still Shut Down](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html). The included dataset offers a state-by-state overview of the current level of reopen and/or shut down as a result of the coronavirus (COVID-19) pandemic. Estimated state population data from the United States Census Bureau is also included.
+This resource is adapted from an article published by The New York Times - [See How All 50 States Are Reopening (and Closing Again)](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html). The included dataset offers a state-by-state overview of the current level of reopen and/or shut down as a result of the coronavirus (COVID-19) pandemic. Estimated state population data from the United States Census Bureau is also included.
 
 #### Data Source
 This resource is adapted from two sources:
 
-1. [The New York Times | See Which States Are Reopening and Which Are Still Shut Down](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html)
+1. [The New York Times | See How All 50 States Are Reopening (and Closing Again)](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html)
 
 2. [United States Census Bureau | State Population Totals: 2010-2019](https://www.census.gov/data/datasets/time-series/demo/popest/2010s-state-total.html)
 
 The included dataset is presented in CSV and JSON format, and is presented with the following columns:
 
-`state_abbreviation, state, status, date_details, restriction_start, restriction_end, status_details, external_link, reopened_personal_care, reopened_retail, reopened_outdoor_and_recreation, reopened_houses_of_worship, reopened_entertainment, reopened_food_and_drink, reopened_industries, reopening_soon_personal_care, reopening_soon_retail, reopening_soon_outdoor_and_recreation, reopening_soon_houses_of_worship, reopening_soon_entertainment, reopening_soon_food_and_drink, reopening_soon_industries, population`
 
 - `state_abbreviation`: two letter state abbreviation (e.g. `NY`, `CA`)
 - `state`: state's name (e.g. `New York`, `California`)
-- `status`: current state of reopen and/or shut down (e.g. `reopening`, `shutdown-restricted`)
+- `status`: current state of opening and/or closing (e.g. `reopened`, `reopening`, `pausing`, `reversing`)
 - `date_details`: information regarding when restrictions were put in place, when they or set to expire, or when they were lifted
 - `restriction_start`: date parsed from date_details for when some sort of restriction was implimented
 - `restriction_end`: date parsed from date_details for when restrictions were - or are planned - to be lifted
@@ -26,7 +25,7 @@ The included dataset is presented in CSV and JSON format, and is presented with 
 - `external_link`: additional resource referenced in the New York Times article
 - `population`: United States Census Bureau's 2019 estimate for a state's total population
 
-The columns beginning with `reopened` and `reopening_soon` offer specific details on the current state of resources/businesses within a given category. The included categories are:
+The columns beginning with `opened` and `closed` offer specific details on the current state of resources/businesses within a given category. The included categories are:
 - `personal_care`
 - `retail`
 - `outdoor_and_recreation`
@@ -36,11 +35,15 @@ The columns beginning with `reopened` and `reopening_soon` offer specific detail
 - `industries`
 
 Note:
-- if a  status for a category of businesses in a given state is `reopened`/`reopening_soon` but does not include further details, the corresponding data field be `True`.
+- if a  status for a category of businesses in a given state is `opened`/`closed` but does not include further details, the corresponding data field be `TRUE`.
 - empty data fields in the CSV file or `null` values in the JSON file do not have applicable values from the data source.
 
+### Changelog
+#### 2020-7-1
+- Adjustments to the resulting dataset was needed to account for changes to The New York Times article. Resulting datasets now offer details in `opened_` and `closed_` prefixes.
+
 ## More Information
-- Source - [The New York Times | See Which States Are Reopening and Which Are Still Shut Down](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html)
+- Source - [The New York Times | See How All 50 States Are Reopening (and Closing Again)](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html)
 - Source - [United States Census Bureau | State Population Totals: 2010-2019](https://www.census.gov/data/datasets/time-series/demo/popest/2010s-state-total.html)
 - [Terms of Use](https://www.copyright.gov/fair-use/more-info.html)
 - Frequency: Daily
