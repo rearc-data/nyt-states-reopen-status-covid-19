@@ -6,35 +6,9 @@ from html.parser import HTMLParser
 import operator
 import csv
 import json
-from datetime import datetime
 from multiprocessing.dummy import Pool
-
-# parse/format dates in date_details field for use in restriction_start and
-# restriction_end field
-
-
-def parse_date(date_details):
-    restriction_start = None
-    restriction_end = None
-
-    if ' effect since ' in date_details:
-        date_str = ' '.join(date_details.split(
-            ' effect since ', 1)[1].split(' ', 2)[:2])
-        restriction_start = datetime.strptime(
-            date_str + ' 2020', '%B %d %Y').date().strftime('%Y-%m-%d')
-
-    if ' set to expire ' in date_details:
-        date_str = ' '.join(date_details.split(
-            ' set to expire ', 1)[1].split(' ', 2)[:2])
-        restriction_end = datetime.strptime(
-            date_str + ' 2020', '%B %d %Y').date().strftime('%Y-%m-%d')
-    elif ' expired on ' in date_details:
-        date_str = ' '.join(date_details.split(
-            ' expired on ', 1)[1].split(' ', 2)[:2])
-        restriction_end = datetime.strptime(
-            date_str + ' 2020', '%B %d %Y').strftime('%Y-%m-%d')
-
-    return [restriction_start, restriction_end]
+import time
+from s3_md5_compare import md5_compare
 
 
 class MyHTMLParser(HTMLParser):
@@ -45,20 +19,12 @@ class MyHTMLParser(HTMLParser):
         # various variables to be used while parsing html content
         self.full_data = []
         self.step_data = {}
-
         self.current_tag = ''
         self.current_class = ''
-
-        self.within_date_details = False
-        self.date_details_str = ''
-
         self.within_text = False
-
         self.within_opened = False
         self.within_closed = False
-
         self.current_cat = ''
-
         self.categories = set()
 
     def handle_starttag(self, tag, attr):
@@ -114,17 +80,8 @@ class MyHTMLParser(HTMLParser):
             # assign attributes of state entries
                 self.step_data['state_abbreviation'] = data_state
 
-                if self.current_class == "g-state g-cat-forward":
-                    self.step_data['status'] = "reopening"
-                else:
-                    self.step_data['status'] = self.current_class.split(
-                        'g-state g-cat-', 1)[1]
-
             if self.current_class == 'g-stateCaseChartShell':
                 self.step_data['state'] = data_state
-
-            if self.current_class == 'g-date-details':
-                self.within_date_details = True
 
             if self.current_class == 'g-text-wrap':
                 self.within_text = True
@@ -173,36 +130,17 @@ class MyHTMLParser(HTMLParser):
 
     def handle_endtag(self, tag):
 
-        # finished processing for date_details attribute when leaving div tag
-        if tag.lower() == 'div' and self.within_date_details:
-            self.step_data['date_details'] = self.date_details_str
-
-            date_str = parse_date(self.date_details_str.replace('.', ''))
-
-            if date_str[0] != None:
-                self.step_data['restriction_start'] = date_str[0]
-
-            if date_str[1] != None:
-                self.step_data['restriction_end'] = date_str[1]
-
-            self.within_date_details = False
-            self.date_details_str = ''
-
         # close self.within_text when leaving div tag
         if tag.lower() == 'div' and self.within_text:
             self.with_text = False
 
     def handle_data(self, data):
 
-        # construct date_details attribute
-        if self.within_date_details and self.current_tag == 'span':
-            if len(self.date_details_str) == 0:
-                self.date_details_str = data
-            else:
-                self.date_details_str = self.date_details_str + ' ' + data
-
         if self.within_text and self.current_class == 'g-text':
             self.step_data['status_details'] = data
+
+        if self.current_class.startswith('g-rule g-'):
+            self.step_data[self.current_class.split('g-rule g-', 1)[1]] = data
 
         # set key for status variations
         if self.current_class == 'g-cat-name':
@@ -231,16 +169,24 @@ class MyHTMLParser(HTMLParser):
 
 
 def download_data(url):
+    response = None
+    retries = 5
+    for attempt in range(retries):
+        try:
+            response = urlopen(url)
+        except HTTPError as e:
+            if attempt == retries:
+                raise Exception('HTTPError: ', e.code)
+            time.sleep(0.2 * attempt)
+        except URLError as e:
+            if attempt == retries:
+                raise Exception('URLError: ', e.reason)
+            time.sleep(0.2 * attempt)
+        else:
+            break
 
-    try:
-        response = urlopen(url)
-
-    except HTTPError as e:
-        raise Exception('HTTPError: ', e.code, url)
-
-    except URLError as e:
-        raise Exception('URLError: ', e.reason, url)
-
+    if response is None:
+        raise Exception('There was an issue downloading the dataset')
     else:
         return response.read().decode()
 
@@ -270,8 +216,8 @@ def source_dataset(new_filename, s3_bucket, new_s3_key):
         population_data[row[4]] = row[5]
 
     # creating fieldnames variable to set order of data
-    fieldnames = ['state_abbreviation', 'state',
-                  'status', 'date_details', 'restriction_start', 'restriction_end', 'status_details', 'external_link']
+    fieldnames = ['state_abbreviation', 'state', 'businesses',
+                  'masks', 'community', 'status_details', 'external_link']
 
     # adding categories variations to fieldnames
     for category in parser.categories:
@@ -297,14 +243,29 @@ def source_dataset(new_filename, s3_bucket, new_s3_key):
         j.write(']')
 
     # uploading to s3
-    asset_list = []
-
+    s3_uploads = []
     s3 = boto3.client('s3')
 
     for filename in os.listdir('/tmp'):
-        s3.upload_file('/tmp/' + filename, s3_bucket,
-                       new_s3_key + filename)
-        asset_list.append(
-            {'Bucket': s3_bucket, 'Key': new_s3_key + filename})
+        file_location = '/tmp/' + filename
+        has_changes = md5_compare(s3, s3_bucket, new_s3_key + filename, file_location)
+        if has_changes:
+            s3.upload_file(file_location, s3_bucket, new_s3_key + filename)
+            print('Uploaded: ' + filename)
+        else:
+            print('No changes in: ' + filename)
+
+        asset_source = {'Bucket': s3_bucket, 'Key': new_s3_key + filename}
+        s3_uploads.append({'has_changes': has_changes,
+                            'asset_source': asset_source})
+
+    count_updated_data = sum(
+        upload['has_changes'] == True for upload in s3_uploads)
+    asset_list = []
+    if count_updated_data > 0:
+        asset_list = list(
+            map(lambda upload: upload['asset_source'], s3_uploads))
+        if len(asset_list) == 0:
+            raise Exception('Something went wrong when uploading files to s3')
 
     return asset_list
