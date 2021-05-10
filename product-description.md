@@ -45,6 +45,10 @@ Note:
     - Removed `status` field and replaced with `businesses`, `masks` and `community` fields
     - Removed `date_details`, `restriction_start` and `restriction_end`
 
+#### 2021-5-10
+- Per changes to the source New York Times article:
+    - Added `reopening` field
+
 ## More Information
 - Source - [The New York Times | See How All 50 States Are Reopening (and Closing Again)](https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html)
 - Source - [United States Census Bureau | State Population Totals: 2010-2019](https://www.census.gov/data/datasets/time-series/demo/popest/2010s-state-total.html)

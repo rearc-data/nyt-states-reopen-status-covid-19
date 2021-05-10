@@ -11,4 +11,9 @@ All notable changes to this project will be documented in this file. The format 
 ### Changed
 - Per changes to the source New York Times article:
     - Removed `status` field and replaced with `businesses`, `masks` and `community` fields
-    - Removed `date_details`, `restriction_start` and `restriction_end`
+    - Removed `date_details`, `restriction_start` and `restriction_end`## 2021-1-29
+
+## 2021-5-10
+### Changed
+- Per changes to the source New York Times article:
+    - Added `reopening` field

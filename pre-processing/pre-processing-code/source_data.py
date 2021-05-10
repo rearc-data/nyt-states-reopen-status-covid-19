@@ -225,6 +225,10 @@ def source_dataset(new_filename, s3_bucket, new_s3_key):
 
     fieldnames.append('population')
 
+    # 5/10/2021 as source data has changed
+    fieldnames.append('reopening')
+
+
     # creating the csv file
     with open('/tmp/' + new_filename + '.csv', 'w', encoding='utf-8') as c:
         writer = csv.DictWriter(c, fieldnames=fieldnames)

@@ -181,3 +181,8 @@ $RECYCLE.BIN/
 **/pre-processing-code.zip
 
 response.json
+
+# Pycharm and debugging:
+.idea/
+venv/
+pre-processing/pre-processing-code/wrapper.py
