@@ -1,7 +1,7 @@
 export ASSET_BUCKET='rearc-data-provider'
 export MANIFEST_BUCKET='norbert-test-adx-publisher-coordinator-manifest-bucket'
 export CUSTOMER_ID='rearc'
-export DATASET_NAME='nyt-states-reopen-status-covid-19'
+export DATASET_NAME='nyt-states-reopen-status-covid-19-platform'
 export DATASET_ARN='arn:aws:dataexchange:us-east-1:796406704065:data-sets/6afda64ca351e462006618317d6c2f7b'
 export PRODUCT_NAME='COVID-19 United States Reopen and Shut Down Status by State | NY Times'
 export PRODUCT_ID='prod-csznmknbjsrn6'
