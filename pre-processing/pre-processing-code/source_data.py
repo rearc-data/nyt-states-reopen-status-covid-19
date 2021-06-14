@@ -191,7 +191,17 @@ def download_data(url):
         return response.read().decode()
 
 
-def source_dataset(new_filename, s3_bucket, new_s3_key):
+def source_dataset(): #new_filename, s3_bucket, new_s3_key):
+
+    dataset_name = os.getenv('DATASET_NAME')
+    asset_bucket = os.getenv('ASSET_BUCKET')
+
+    data_dir = '/tmp'
+    if not os.path.exists(data_dir):
+        os.mkdir(data_dir)
+
+    file_location_csv = os.path.join(data_dir, dataset_name + '.csv')
+    file_location_json = os.path.join(data_dir, dataset_name + '.json')
 
     urls = [
         'https://www.nytimes.com/interactive/2020/us/states-reopen-map-coronavirus.html',
@@ -230,7 +240,7 @@ def source_dataset(new_filename, s3_bucket, new_s3_key):
 
 
     # creating the csv file
-    with open('/tmp/' + new_filename + '.csv', 'w', encoding='utf-8') as c:
+    with open(file_location_csv, 'w', encoding='utf-8') as c:
         writer = csv.DictWriter(c, fieldnames=fieldnames)
         writer.writeheader()
 
@@ -239,7 +249,7 @@ def source_dataset(new_filename, s3_bucket, new_s3_key):
             writer.writerow(row)
 
     # creating the json file
-    with open('/tmp/' + new_filename + '.json', 'w', encoding='utf-8') as j, open('/tmp/' + new_filename + '.csv', 'r') as c:
+    with open(file_location_json, 'w', encoding='utf-8') as j, open(file_location_csv, 'r') as c:
         reader = csv.DictReader(c)
         j.write('[')
         j.write(',\n'.join(json.dumps(row).replace('""', 'null')
@@ -250,18 +260,24 @@ def source_dataset(new_filename, s3_bucket, new_s3_key):
     s3_uploads = []
     s3 = boto3.client('s3')
 
-    for filename in os.listdir('/tmp'):
-        file_location = '/tmp/' + filename
-        has_changes = md5_compare(s3, s3_bucket, new_s3_key + filename, file_location)
-        if has_changes:
-            s3.upload_file(file_location, s3_bucket, new_s3_key + filename)
-            print('Uploaded: ' + filename)
-        else:
-            print('No changes in: ' + filename)
+    for filename in os.listdir('/tmp/'):
+        if filename.startswith(dataset_name):
 
-        asset_source = {'Bucket': s3_bucket, 'Key': new_s3_key + filename}
-        s3_uploads.append({'has_changes': has_changes,
-                            'asset_source': asset_source})
+            file_location = '/tmp/' + filename
+
+            obj_name = file_location.split('/', 3).pop().replace(' ', '_').lower()
+            new_s3_key = dataset_name + '/dataset/' + obj_name
+
+            has_changes = md5_compare(s3, asset_bucket, new_s3_key, file_location)
+            if has_changes:
+                s3.upload_file(file_location, asset_bucket, new_s3_key + filename)
+                print('Uploaded: ' + filename)
+            else:
+                print('No changes in: ' + filename)
+
+            asset_source = {'Bucket': asset_bucket, 'Key': new_s3_key}
+            s3_uploads.append({'has_changes': has_changes,
+                                'asset_source': asset_source})
 
     count_updated_data = sum(
         upload['has_changes'] == True for upload in s3_uploads)
