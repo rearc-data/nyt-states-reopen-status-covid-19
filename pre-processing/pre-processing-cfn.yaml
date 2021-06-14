@@ -3,10 +3,17 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: "AWS::Serverless-2016-10-31"
 # CloudFormation template in YAML to setup an automated process to update revisions to datasets in AWS Data Exchange
 Parameters:
-  S3Bucket:
+  AssetBucket:
     Type: String
     Default: rearc-data-provider
-    Description: Provide the S3 Bucket name where this dataset resides. For e.g. rearc-data-provider
+    Description: The S3 Bucket name where this dataset resides.
+  ManifestBucket:
+    Type: String
+    Description: The Manifest S3 Bucket name where the manifest file will be uploaded.
+  CustomerId:
+    Type: String
+    Default: rearc
+    Description: This is the customer Id in Rearc Data Platform and will be used as prefix in manifest bucket.
   DataSetName:
     Type: String
     Description: Name of the dataset
@@ -20,6 +27,9 @@ Parameters:
     Type: String
     Default: us-east-1
     Description: AWS Region for AWS Data Exchange
+  ScheduleCron:
+    Type: String
+    Description: Cron Expression for the Lambda Run Schedule
 
 Resources:
 # Create an IAM role for Lambda to use
@@ -40,6 +50,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::796406704065:policy/AWSDataExchangeService
         - arn:aws:iam::aws:policy/AWSMarketplaceSellerFullAccess
+        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
       Path: /
 
 # Create a Lambda function that will update daily revisions to AWS Data Exchange dataset
@@ -54,27 +65,30 @@ Resources:
       Description: "Source revision updates to AWS Data Exchange data set"
       Runtime: "python3.7"
       Code:
-        S3Bucket:
-          Fn::Sub: ${S3Bucket}
+        S3Bucket: !Sub ${AssetBucket}
         S3Key:
           !Join
             - ''
             - - Fn::Sub: ${DataSetName}
               - '/automation/pre-processing-code.zip'
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
-      Timeout: 120
+      MemorySize: 2048
+      Timeout: 900
       Role:
         Fn::GetAtt:
           - LambdaRole
           - Arn
       Environment:
         Variables:
-          S3_BUCKET:
-            Fn::Sub: ${S3Bucket}
-          DATA_SET_NAME:
+          ASSET_BUCKET:
+            Fn::Sub: ${AssetBucket}
+          MANIFEST_BUCKET:
+            Fn::Sub: ${ManifestBucket}
+          CUSTOMER_ID:
+            Fn::Sub: ${CustomerId}
+          DATASET_NAME:
             Fn::Sub: ${DataSetName}
-          DATA_SET_ARN:
+          DATASET_ARN:
             Fn::Sub: ${DataSetArn}
           PRODUCT_ID:
             Fn::Sub: ${ProductId}
@@ -85,7 +99,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: "ScheduledRule"
-      ScheduleExpression: "cron(0 * * * ? *)"
+      ScheduleExpression: !Sub ${ScheduleCron}
       State: "ENABLED"
       Targets:
         -
@@ -106,6 +120,22 @@ Resources:
         Fn::GetAtt:
           - "ScheduledRule"
           - "Arn"
+
+  version:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref "LambdaFunction"
+
+  asyncconfig:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      DestinationConfig:
+          OnFailure:
+            Destination: arn:aws:sns:us-east-1:796406704065:adx-lambda-error
+      FunctionName: !Ref "LambdaFunction"
+      MaximumEventAgeInSeconds: 300
+      MaximumRetryAttempts: 2
+      Qualifier: $LATEST
 
 Outputs:
   LambdaRoleARN:
