@@ -19,24 +19,46 @@ while [[ $# -gt 0 ]]; do
   shift;
   current_arg="$1"
   case ${opt} in
-    "--schedule_cron") export SCHEDULE_CRON="$1"; shift;;
+    "--rdp-role-arn") export RDP_ROLE_ARN="$1"; shift;;
+    "--rdp-external-id") export RDP_EXTERNAL_ID="$1"; shift;;
+    "--customer-id") export CUSTOMER_ID="$1"; shift;;
+    "--schedule-cron") export SCHEDULE_CRON="$1"; shift;;
     "--asset-bucket") export ASSET_BUCKET="$1"; shift;;
     "--manifest-bucket") export MANIFEST_BUCKET="$1"; shift;;
-    "--customer-id") export CUSTOMER_ID="$1"; shift;;
     "--dataset-name") export DATASET_NAME="$1"; shift;;
     "--product-name") export PRODUCT_NAME="$1"; shift;;
     "--product-id") export PRODUCT_ID="$1"; shift;;
     "--dataset-arn") export DATASET_ARN="$1"; shift;;
     "--region") export REGION="$1"; shift;;
-    "--first_revision") export FIRST_REVISION="$1"; shift;;
-    "--products_info_file") export PRODUCTS_INFO_FILE="$1"; shift;;
-    "--source_url") export SOURCE_URL="$1"; shift;;
-    "--product_code") export PRODUCT_CODE="$1"; shift;;
-    "--product_url") export PRODUCT_URL="$1"; shift;;
+    "--first-revision") export FIRST_REVISION="$1"; shift;;
+    "--products-info-file") export PRODUCTS_INFO_FILE="$1"; shift;;
+    "--source-url") export SOURCE_URL="$1"; shift;;
+    "--product-code") export PRODUCT_CODE="$1"; shift;;
+    "--product-url") export PRODUCT_URL="$1"; shift;;
     "--profile") PROFILE=" --profile $1"; shift;;
     *) echo "ERROR: Invalid option: \""$opt"\"" >&2; exit 1;;
   esac
 done
+
+echo "------------------------------------------------------------------------------"
+echo "REARC_DATA_PLATFORM_ROLE_ARN: $REARC_DATA_PLATFORM_ROLE_ARN"
+echo "REARC_DATA_PLATFORM_EXTERNAL_ID: $REARC_DATA_PLATFORM_EXTERNAL_ID"
+echo "CUSTOMER_ID: $CUSTOMER_ID"
+echo "ASSET_BUCKET: $ASSET_BUCKET"
+echo "MANIFEST_BUCKET: $MANIFEST_BUCKET"
+echo "DATASET_NAME: $DATASET_NAME"
+echo "DATASET_ARN: $DATASET_ARN"
+echo "PRODUCT_NAME: $PRODUCT_NAME"
+echo "PRODUCT_ID: $PRODUCT_ID"
+echo "SCHEDULE_CRON: $SCHEDULE_CRON"
+echo "REGION: $REGION"
+echo "PROFILE: $PROFILE"
+echo "PRODUCTS_INFO_FILE: $PRODUCTS_INFO_FILE"
+echo "SOURCE_URL: $SOURCE_URL"
+echo "PRODUCT_CODE: $PRODUCT_CODE"
+echo "PRODUCT_URL: $PRODUCT_URL"
+echo "FIRST_REVISION: $FIRST_REVISION"
+echo "------------------------------------------------------------------------------"
 
 while [[ ${#DATASET_NAME} -gt 53 ]]; do
     echo "dataset-name must be under 53 characters in length, enter a shorter name:"
@@ -100,7 +122,7 @@ else
 
   echo "creating pre-processing cloudformation stack"
   CFN_STACK_NAME="producer-${DATASET_NAME}-preprocessing"
-  aws cloudformation create-stack --stack-name "$CFN_STACK_NAME" --template-body file://pre-processing/pre-processing-cfn.yaml --parameters ParameterKey=AssetBucket,ParameterValue="$ASSET_BUCKET" ParameterKey=ManifestBucket,ParameterValue="$MANIFEST_BUCKET" ParameterKey=CustomerId,ParameterValue="$CUSTOMER_ID" ParameterKey=DataSetName,ParameterValue="$DATASET_NAME" ParameterKey=DataSetArn,ParameterValue="$DATASET_ARN" ParameterKey=ProductId,ParameterValue="$PRODUCT_ID" ParameterKey=Region,ParameterValue="$REGION" ParameterKey=ScheduleCron,ParameterValue="'$SCHEDULE_CRON'" --region "$REGION" --capabilities "CAPABILITY_AUTO_EXPAND" "CAPABILITY_NAMED_IAM" "CAPABILITY_IAM" $PROFILE
+  aws cloudformation create-stack --stack-name "$CFN_STACK_NAME" --template-body file://pre-processing/pre-processing-cfn.yaml --parameters ParameterKey=RearcDataPlatformRoleArn,ParameterValue="$REARC_DATA_PLATFORM_ROLE_ARN" ParameterKey=RearcDataPlatformExternalId,ParameterValue="$REARC_DATA_PLATFORM_EXTERNAL_ID" ParameterKey=AssetBucket,ParameterValue="$ASSET_BUCKET" ParameterKey=ManifestBucket,ParameterValue="$MANIFEST_BUCKET" ParameterKey=CustomerId,ParameterValue="$CUSTOMER_ID" ParameterKey=DataSetName,ParameterValue="$DATASET_NAME" ParameterKey=DataSetArn,ParameterValue="$DATASET_ARN" ParameterKey=ProductId,ParameterValue="$PRODUCT_ID" ParameterKey=Region,ParameterValue="$REGION" ParameterKey=ScheduleCron,ParameterValue="'$SCHEDULE_CRON'" --region "$REGION" --capabilities "CAPABILITY_AUTO_EXPAND" "CAPABILITY_NAMED_IAM" "CAPABILITY_IAM" $PROFILE
 
   echo "waiting for cloudformation stack creation to complete"
   aws cloudformation wait stack-create-complete --stack-name "$CFN_STACK_NAME" --region "$REGION" $PROFILE
