@@ -270,7 +270,7 @@ def source_dataset(): #new_filename, s3_bucket, new_s3_key):
 
             has_changes = md5_compare(s3, asset_bucket, new_s3_key, file_location)
             if has_changes:
-                s3.upload_file(file_location, asset_bucket, new_s3_key + filename)
+                s3.upload_file(file_location, asset_bucket, new_s3_key)
                 print('Uploaded: ' + filename)
             else:
                 print('No changes in: ' + filename)

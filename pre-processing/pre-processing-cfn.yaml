@@ -102,7 +102,7 @@ Resources:
           REGION: !Sub ${Region}
 #      Layers:
 #        - Ref: PyRearcADXLayer
-      Layers: ["arn:aws:lambda:us-east-1:796406704065:layer:rearc-data-utils:31"]
+      Layers: ["arn:aws:lambda:us-east-1:796406704065:layer:rearc-data-utils:32"]
 
 #  PyRearcADXLayer:
 #    Type: AWS::Lambda::LayerVersion

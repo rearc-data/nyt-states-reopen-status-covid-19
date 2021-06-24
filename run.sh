@@ -1,15 +1,15 @@
-export REARC_DATA_PLATFORM_ROLE_ARN='arn:aws:iam::412981388937:role/CrossAccountRole-796406704065-796406704065'
-export REARC_DATA_PLATFORM_EXTERNAL_ID='Rearc-Data-Platform-796406704065'
-export ASSET_BUCKET='rearc-data-provider'
-export MANIFEST_BUCKET='rearc-control-plane-manifest'
-export CUSTOMER_ID='796406704065'
-export DATASET_NAME='nyt-states-reopen-status-covid-19-platform'
-export DATASET_ARN='arn:aws:dataexchange:us-east-1:796406704065:data-sets/0ed4f7cd215d115d0fe37fd3109bd49d'
-export PRODUCT_NAME='COVID-19 United States Reopen and Shut Down Status by State | NY Times'
-export PRODUCT_ID='prod-csznmknbjsrn6'
-export SCHEDULE_CRON="cron(0 9 ? * 3 *)"
-export REGION='us-east-1'
-export PROFILE='adx'
+REARC_DATA_PLATFORM_ROLE_ARN='arn:aws:iam::412981388937:role/CrossAccountRole-796406704065-796406704065'
+REARC_DATA_PLATFORM_EXTERNAL_ID='Rearc-Data-Platform-796406704065'
+ASSET_BUCKET='rearc-data-provider'
+MANIFEST_BUCKET='rearc-control-plane-manifest'
+CUSTOMER_ID='796406704065'
+DATASET_NAME='nyt-states-reopen-status-covid-19'
+DATASET_ARN='arn:aws:dataexchange:us-east-1:796406704065:data-sets/0ed4f7cd215d115d0fe37fd3109bd49d'
+PRODUCT_NAME='COVID-19 United States Reopen and Shut Down Status by State | NY Times'
+PRODUCT_ID='prod-csznmknbjsrn6'
+SCHEDULE_CRON="cron(0 * * * ? *)"
+REGION='us-east-1'
+PROFILE='guardian-pg'
 
 echo "------------------------------------------------------------------------------"
 echo "RearcDataPlatformRoleArn: $REARC_DATA_PLATFORM_ROLE_ARN"
@@ -39,6 +39,7 @@ echo "--------------------------------------------------------------------------
     --dataset-name "${DATASET_NAME}" \
     --product-name "${PRODUCT_NAME}" \
     --product-id "${PRODUCT_ID}" \
+    --dataset-arn "${DATASET_ARN}" \
     --region "${REGION}" \
     --first-revision "false" \
     --profile "${PROFILE}"

@@ -19,8 +19,8 @@ while [[ $# -gt 0 ]]; do
   shift;
   current_arg="$1"
   case ${opt} in
-    "--rdp-role-arn") export RDP_ROLE_ARN="$1"; shift;;
-    "--rdp-external-id") export RDP_EXTERNAL_ID="$1"; shift;;
+    "--rdp-role-arn") export REARC_DATA_PLATFORM_ROLE_ARN="$1"; shift;;
+    "--rdp-external-id") export REARC_DATA_PLATFORM_EXTERNAL_ID="$1"; shift;;
     "--customer-id") export CUSTOMER_ID="$1"; shift;;
     "--schedule-cron") export SCHEDULE_CRON="$1"; shift;;
     "--asset-bucket") export ASSET_BUCKET="$1"; shift;;
